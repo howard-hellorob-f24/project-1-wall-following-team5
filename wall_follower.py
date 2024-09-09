@@ -2,7 +2,6 @@ import time
 import numpy as np
 from mbot_bridge.api import MBot
 
-
 def find_min_dist(ranges, thetas):
     """Finds the length and angle of the minimum ray in the scan.
 
@@ -15,9 +14,13 @@ def find_min_dist(ranges, thetas):
     Returns:
         tuple: The length and angle of the shortest ray in the Lidar scan.
     """
-    min_dist, min_angle = None, None
+    min_dist, min_angle = float('inf'), None
 
-    # TODO: Find the length and angle of the shortest distance in the ray.
+    for i, dist in enumerate(ranges):
+        if dist > 0:  # Ignore invalid ranges
+            if dist < min_dist:
+                min_dist = dist
+                min_angle = thetas[i]
 
     return min_dist, min_angle
 
@@ -33,24 +36,12 @@ def cross_product(v1, v2):
         list: The result of the cross product operation.
     """
     res = np.zeros(3)
-    # TODO: Compute the cross product.
+    res[0] = v1[1] * v2[2] - v1[2] * v2[1]
+    res[1] = v1[2] * v2[0] - v1[0] * v2[2]
+    res[2] = v1[0] * v2[1] - v1[1] * v2[0]
     return res
 
 
 robot = MBot()
-setpoint = 0  # TODO: Pick your setpoint.
-# TODO: Declare any other variables you might need here.
-
-try:
-    while True:
-        # Read the latest lidar scan.
-        ranges, thetas = robot.read_lidar()
-
-        # TODO: (P1.2) Write code to follow the nearest wall here.
-        # Hint: You should use the functions cross_product and find_min_dist.
-
-        # Optionally, sleep for a bit before reading a new scan.
-        time.sleep(0.1)
-except:
-    # Catch any exception, including the user quitting, and stop the robot.
-    robot.stop()
+setpoint = 0.5  # Setpoint for the desired distance from the wall
+kp = 0.5  # Proportional gain for
