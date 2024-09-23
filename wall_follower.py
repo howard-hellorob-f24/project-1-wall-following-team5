@@ -17,7 +17,7 @@ robot = MBot()
 
 # Parameters
 setpoint = 0.5  # Desired distance from the wall in meters
-kp = 1.0        # Increased Proportional gain for more aggressive turning
+kp = 1.0        # Proportional gain for wall-following control
 min_safe_dist = 0.3  # Minimum safe distance to avoid hitting the wall
 max_safe_dist = 0.7  # Maximum safe distance to prevent moving too far from the wall
 
@@ -50,7 +50,7 @@ try:
             angular_velocity = kp * error
             forward_velocity = 0.2  # Normal forward speed
 
-        # Move the robot: adjust turning rate based on angular velocity
+        # Move the robot: pass both the forward velocity and angular velocity
         robot.drive(forward_velocity, angular_velocity)
 
         # Optionally, print out debug info
@@ -62,4 +62,3 @@ try:
 except KeyboardInterrupt:
     # Stop the robot when the user interrupts the program
     robot.stop()
-
