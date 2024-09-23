@@ -12,14 +12,6 @@ def find_min_dist(ranges, thetas):
                 min_angle = thetas[i]
     return min_dist, min_angle
 
-def cross_product(v1, v2):
-    """Compute the Cross Product between two vectors (unused in this task)."""
-    res = np.zeros(3)
-    res[0] = v1[1] * v2[2] - v1[2] * v2[1]
-    res[1] = v1[2] * v2[0] - v1[0] * v2[2]
-    res[2] = v1[0] * v2[1] - v1[1] * v2[0]
-    return res
-
 # Initialize the robot
 robot = MBot()
 
@@ -47,6 +39,8 @@ try:
         
         # Move the robot: turn towards/away from the wall based on angular velocity
         forward_velocity = 0.2  # Move forward at a constant speed
+        
+        # Pass both the forward velocity and angular velocity to the drive function
         robot.drive(forward_velocity, angular_velocity)
 
         # Optionally, print out debug info
@@ -58,3 +52,4 @@ try:
 except KeyboardInterrupt:
     # Stop the robot when the user interrupts the program
     robot.stop()
+
