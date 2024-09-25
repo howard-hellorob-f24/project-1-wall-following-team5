@@ -4,14 +4,26 @@ from mbot_bridge.api import MBot
 
 def find_min_dist(ranges, thetas):
     """Finds the length and angle of the minimum ray in the scan."""
+    ranges = []
+    robot.read_lidar_scan(ranges)
+    thetas = np.linspace(-np.pi, np.pi, len(ranges))
     min_dist, min_angle = float('inf'), None
-    for i, dist in enumerate(ranges):
-        if dist > 0:  # Ignore invalid ranges (e.g., zero or negative)
-            if dist < min_dist:
-                min_dist = dist
-                min_angle = thetas[i]
+    min_index = np.argmin(ranges)
+    min_dist = ranges[min_index] 
+    min_angle = thetas[min_index]
+    # for i, dist in enumerate(ranges):
+    #     if dist > 0:  # Ignore invalid ranges (e.g., zero or negative)
+    #         if dist < min_dist:
+    #             min_dist = dist
+    #             min_angle = thetas[i]
     return min_dist, min_angle
 
+def cross_product(v_to_wall, v_up):
+    v_to_wall = np.array([1*cos(min_angle), 1*sin(min_angle), 0])
+    v_up = np.array([0, 0, 1])
+    v_forward = np.cross(v_to_wall, v_up)
+    return v_forward
+    
 # Initialize the robot
 robot = MBot()
 
@@ -62,3 +74,4 @@ try:
 except KeyboardInterrupt:
     # Stop the robot when the user interrupts the program
     robot.stop()
+    
