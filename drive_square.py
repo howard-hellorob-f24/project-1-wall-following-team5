@@ -4,10 +4,10 @@ from mbot_bridge.api import MBot
 robot = MBot()
 
 # Constants
-VELOCITY_X = 1.0  # Forward velocity in inches per second (adjust based on actual speed)
-TURN_SPEED = 0.5  # Angular velocity (adjust based on how fast the robot turns)
-DRIVE_TIME = 2.0  # Time to drive 8 inches (adjust based on speed)
-TURN_TIME = 1.0   # Time to turn 90 degrees (adjust based on turning speed)
+VELOCITY_X = 0.5  # Slower forward velocity (in inches per second)
+TURN_SPEED = 0.3  # Slower angular velocity (adjust based on desired turning speed)
+DRIVE_TIME = 4.0  # Time to drive 8 inches (adjust based on speed, increased due to slower velocity)
+TURN_TIME = 1.5   # Adjusted time to turn 90 degrees (slower turn)
 REPEAT_SQUARE = 3  # Number of times to repeat the square
 
 def drive_square():
@@ -15,7 +15,7 @@ def drive_square():
         # Move forward
         robot.drive(VELOCITY_X, 0, 0)  # Move forward (vx=VELOCITY_X), no sideways (vy=0), no rotation (wz=0)
         time.sleep(DRIVE_TIME)  # Drive for the time to cover 8 inches
-        robot.drive(0, 0, TURN_SPEED)  # Turn 90 degrees
+        robot.drive(0, 0, TURN_SPEED)  # Turn 90 degrees with slower speed
         time.sleep(TURN_TIME)  # Time to turn 90 degrees
         
         # Stop the robot briefly before the next side
