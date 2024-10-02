@@ -6,7 +6,7 @@ robot = MBot()
 # Constants for speed and timing
 VELOCITY_X = 0.4  # Forward velocity (in inches per second, increased for efficiency)
 TURN_SPEED = 1.57  # Angular velocity (rad/s) for 90-degree turns (roughly 1.57 radians for 90 degrees)
-SIDE_LENGTH = 4.0  # Length of one side of the square in inches
+SIDE_LENGTH = 2.0  # Length of one side of the square in inches
 DRIVE_TIME = SIDE_LENGTH / VELOCITY_X  # Time to drive one side of the square based on speed and distance
 TURN_TIME = 1.0   # Time to turn 90 degrees based on TURN_SPEED
 REPEAT_SQUARE = 3  # Number of times to repeat the square
