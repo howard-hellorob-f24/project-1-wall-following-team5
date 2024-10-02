@@ -1,69 +1,95 @@
+from cmath import *
 import time
 import numpy as np
 from mbot_bridge.api import MBot
 
+
 def find_min_dist(ranges, thetas):
-    """Finds the length and angle of the minimum ray in the scan."""
-    min_dist, min_angle = float('inf'), None
-    min_index = np.argmin(ranges)
-    min_dist = ranges[min_index] 
-    min_angle = thetas[min_index]
+    """Finds the length and angle of the minimum ray in the scan.
+
+    Make sure you ignore any rays with length 0! Those are invalid.
+
+    Args:
+        ranges (list): The length of each ray in the Lidar scan.
+        thetas (list): The angle of each ray in the Lidar scan.
+
+        
+
+        "Notes"
+        - Assuming information will be in this type of format
+        ranges = [1.5, 0.0, 2.3, 1.2, 0.0, 3.4]
+        thetas = [0, 15, 30, 45, 60, 75]
+        -thus each range has a corresponding angle at x index in thetas
+
+    Returns:
+        tuple: The length and angle of the shortest ray in the Lidar scan.
+    """
+
+    index = 0
+    shortest = ranges[0]
+    for i in ranges:
+        if i < shortest and i != 0:
+            shortest = i
+            index = ranges.index(i)
+
+    min_dist, min_angle = shortest, thetas[index]
+
+    # TODO: Find the length and angle of the shortest distance in the ray.
+
     return min_dist, min_angle
 
-def cross_product(min_angle):
-    v_to_wall = np.array([np.cos(min_angle), np.sin(min_angle), 0])
-    v_up = np.array([0, 0, 1])
-    v_forward = np.cross(v_to_wall, v_up)
-    return v_forward
 
-# Initialize the robot
+def cross_product(v1, v2):
+    """Compute the Cross Product between two vectors.
+
+    Args:
+        v1 (list): First vector of length 3.
+        v2 (list): Second vector of length 3.
+
+        Cross Product Formula:
+        cx = aybz-azby
+        cy = azbx-axbz
+        cz = axby-aybx
+
+    Returns:
+        list: The result of the cross product operation.
+    """
+    cx = v1[1] * v2[2] - v1[2] * v2[1]
+    cy = v1[2] * v2[0] - v1[0] * v2[2]
+    cz = v1[0] * v2[1] - v1[1] * v2[0]
+    res = [cx, cy, cz]
+    # TODO: Compute the cross product.
+    return res
+
+
 robot = MBot()
-
-# Parameters
-setpoint = 0.5  # Desired distance from the wall in meters
-kp = 1.0        # Proportional gain for wall-following control
-min_safe_dist = 0.3  # Minimum safe distance to avoid hitting the wall
-max_safe_dist = 0.7  # Maximum safe distance to prevent moving too far from the wall
+setpoint = 1  # TODO: Pick your setpoint.
+# TODO: Declare any other variables you might need here.
 
 try:
     while True:
-        # Read the latest lidar scan
+        # Read the latest lidar scan.
         ranges, thetas = robot.read_lidar()
 
-        # Find the minimum distance and the corresponding angle
+        # TODO: (P1.2) Write code to follow the nearest wall here.
+        # Hint: You should use the functions cross_product and find_min_dist.
+        #Find the min distance and angle
         min_dist, min_angle = find_min_dist(ranges, thetas)
 
-        if min_dist is None or min_dist == float('inf'):
-            # No valid distances, skip this iteration
-            continue
+        #Cross Product
+        v_wall = [1*cos(min_angle), 1*sin(min_angle), 0] #x, y, z, this is the vector the robot will be driving to the wall
+        up_vector = [0, 0, 1]
+        cross = cross_product(v_wall, up_vector) #forward velocity vector
 
-        # Ensure that the robot doesn't react to obstacles that are too far
-        if min_dist < min_safe_dist:
-            # If the robot is too close to the wall, stop or reverse
-            print("Too close to the wall, adjusting...")
-            robot.drive(0, 0)  # Stop to avoid collision
-            time.sleep(0.5)
-            continue
-        elif min_dist > max_safe_dist:
-            # If the robot is too far from the wall, turn toward it more aggressively
-            angular_velocity = kp * (setpoint - min_dist)
-            forward_velocity = 0.15  # Slow forward speed
-        else:
-            # Normal wall-following behavior
-            error = setpoint - min_dist
-            angular_velocity = kp * error
-            forward_velocity = 0.2  # Normal forward speed
+        #Correction Vector
+        if cross[0] < setpoint:
+            correction_vector = [setpoint, 0, 0]
 
-        # Move the robot: pass both the forward velocity and angular velocity
-        robot.drive(forward_velocity, angular_velocity)
-
-        # Optionally, print out debug info
-        print(f"Min Distance: {min_dist:.2f} m, Angle: {min_angle:.2f} rad, Angular Velocity: {angular_velocity:.2f}")
-
-        # Sleep for a bit before reading a new scan
+        #final control command
+        final_v = [cross[0] + correction_vector[0], cross[1] + correction_vector[1], cross[2] + correction_vector[2]]
+        robot.drive(final_v[0], final_v[1], final_v[2])
+        # Optionally, sleep for a bit before reading a new scan.
         time.sleep(0.1)
-
-except KeyboardInterrupt:
-    # Stop the robot when the user interrupts the program
+except:
+    # Catch any exception, including the user quitting, and stop the robot.
     robot.stop()
-    
