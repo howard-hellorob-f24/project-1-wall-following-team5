@@ -27,8 +27,12 @@ def drive_square_three_times():
     for _ in range(REPEAT_SQUARE):  # Repeat the square-driving pattern 3 times
         drive_square()
 
-# Start the process
-drive_square_three_times()
-
-# Stop the robot at the end
-robot.stop()
+# Use try-except to handle Ctrl + C
+try:
+    # Start the process
+    drive_square_three_times()
+except KeyboardInterrupt:
+    print("\nProcess interrupted. Stopping the robot.")
+    robot.stop()  # Ensure the robot stops if the program is interrupted
+finally:
+    robot.stop()  # Ensure the robot is always stopped, even if there's an error
