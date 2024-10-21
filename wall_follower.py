@@ -84,7 +84,8 @@ try:
         #Correction Vector
         if cross[0] < setpoint:
             correction_vector = [setpoint, 0, 0]
-
+        else:
+            continue
         #final control command
         final_v = [cross[0] + correction_vector[0], cross[1] + correction_vector[1], cross[2] + correction_vector[2]]
         robot.drive(final_v[0], final_v[1], final_v[2])
